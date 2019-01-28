@@ -1,13 +1,14 @@
-// This do-file defines the program prepare_panel_scm.
+// This do-file defines the program prepare_toy_panel_scm.
 
 
 // Load dependencies
 do programs/instantiate_panel.do
 
-capture program drop prepare_panel_scm
-program define prepare_panel_scm
-/* Prepare a panel dataset with simulated data for using the Synthetic Control 
-Method (SCM). */
+capture program drop prepare_toy_panel_scm
+program define prepare_toy_panel_scm
+/* Prepare a toy panel dataset with simulated data for using the Synthetic 
+Control Method (SCM). The different predictor variables are independent from
+each other.*/
 	args n_periods n_units trperiod treatment_effect treatment_effect_type
 	
 	instantiate_panel `n_periods' `n_units'
