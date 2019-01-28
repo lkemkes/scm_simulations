@@ -8,12 +8,12 @@ do programs/conduct_scm.do
 capture program drop scm_simulation
 program define scm_simulation, eclass
 	
-	args n_periods trperiod n_units
+	args n_periods trperiod n_units treat
 	
 	di "Treatment Period:"
 	di `trperiod'
 	
-	prepare_panel_resembling_ca_data `n_periods' `n_units' `trperiod'
+	prepare_panel_resembling_ca_data `n_periods' `trperiod' `n_units' "`treat'"
 	
 	* SCM
 	conduct_scm "Y" "Z1 Z2 Z3 Z4 Z5" 1 `trperiod'

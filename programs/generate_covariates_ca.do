@@ -16,3 +16,5 @@ distribution as the covariates in the California tobacco dataset. */
 	gen unit = _n
 
 end
+
+generate_covariates_ca
