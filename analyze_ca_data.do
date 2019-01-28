@@ -36,3 +36,17 @@ keep state Z_lnincome Z_beer Z_age15to24 Z_retprice Z_cigsale
 correlate Z_lnincome Z_beer Z_age15to24 Z_retprice Z_cigsale, covariance
 matrix capital_sigma = r(C)
 matrix list capital_sigma
+
+* Store the means of the different variables in the locals mean_1 - mean_5:
+sum Z_lnincome
+local mean_1 `r(mean)'
+sum Z_beer
+local mean_2 `r(mean)'
+sum Z_age15to24
+local mean_3 `r(mean)'
+sum Z_retprice
+local mean_4 `r(mean)'
+sum Z_cigsale
+local mean_5 `r(mean)'
+
+matrix M = `mean_1', `mean_2', `mean_3', `mean_4', `mean_5'
