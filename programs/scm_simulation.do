@@ -6,19 +6,9 @@ do programs/prepare_panel_resembling_ca_data.do
 
 capture program drop scm_simulation
 program define scm_simulation, eclass
-	args n_periods n_units treatment_effect treatment_effect_type
+	args n_periods trperiod n_units treatment_effect treatment_effect_type
 	di `treatment_effect'
 	di "`treatment_effect_type'"
-	
-	* Define treatment period
-	if mod(`n_periods', 2) == 1 {
-		/* if number of periods is odd */ 
-		local trperiod = `n_periods' / 2 + 0.5
-	}
-	else {
-		/* if number of periods is even */ 
-		local trperiod = `n_periods' / 2
-	}
 	
 	di "Treatment Period:"
 	di `trperiod'

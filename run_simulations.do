@@ -5,7 +5,8 @@ set more off
 // Define parameters:
 local n_reps 1
 local n_units 39
-local n_periods 20
+local n_periods 31
+local trperiod 20
 local seed 42
 
 // Load dependencies:
@@ -22,7 +23,7 @@ foreach a of local treatment_effects {
 		 count_rspme_ratio_higher = e(count_rspme_ratio_higher) ///
 		 count_avg_deviation_higher = e(count_avg_deviation_higher), ///
 		 seed(`seed') ///
-		 reps(`n_reps'): scm_simulation `n_periods' `n_units' `a' constant
+		 reps(`n_reps'): scm_simulation `n_periods' `trperiod' `n_units' `a' constant
 		 
 	save "simulations/simul_`a'_january", replace
 }
