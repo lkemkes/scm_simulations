@@ -1,22 +1,33 @@
 // This do-file defines the program scm_simulation.
 
 
+// Load dependencies
+do programs/prepare_panel_resembling_ca_data.do
+
 capture program drop scm_simulation
 program define scm_simulation, eclass
 	args n_periods n_units treatment_effect treatment_effect_type
 	di `treatment_effect'
 	di "`treatment_effect_type'"
 	
-	assert mod(`n_periods', 2) == 1
-	local trperiod = `n_periods' / 2 + 0.5
+	* Define treatment period
+	if mod(`n_periods', 2) == 1 {
+		/* if number of periods is odd */ 
+		local trperiod = `n_periods' / 2 + 0.5
+	}
+	else {
+		/* if number of periods is even */ 
+		local trperiod = `n_periods' / 2
+	}
+	
 	di "Treatment Period:"
 	di `trperiod'
 	
-	prepare_panel_scm `n_periods' `n_units' `trperiod' `treatment_effect' ///
-		`treatment_effect_type'
+	prepare_panel_resembling_ca_data `n_periods' `n_units' `trperiod' ///
+	`treatment_effect' `treatment_effect_type'
 	
 	* SCM
-	conduct_scm "Y" "Z1 Z2" 1 `trperiod'
+	conduct_scm "Y" "Z1 Z2 Z3 Z4 Z5" 1 `trperiod'
 	local ratio_1 = e(rmspe_posttreatment) / e(rmspe_pretreatment)
 	local avg_deviation_1 = e(avg_deviation_from_sc_post)
 	
@@ -24,7 +35,7 @@ program define scm_simulation, eclass
 	local count_rspme_ratio_higher = 0
 	local count_avg_deviation_higher = 0
 	forvalues i = 2/`n_units' {
-		conduct_scm "Y" "Z1 Z2" `i' `trperiod'
+		conduct_scm "Y" "Z1 Z2 Z3 Z4 Z5" `i' `trperiod'
 		if e(rmspe_posttreatment) / e(rmspe_pretreatment) > `ratio_1' {
 			local count_rspme_ratio_higher = `count_rspme_ratio_higher' + 1
 		}
