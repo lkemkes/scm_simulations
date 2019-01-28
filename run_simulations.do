@@ -1,10 +1,14 @@
 // This do-file runs the simulations.
 set more off
 
+
+// Define parameters:
+local n_reps 1
+local n_units 39
+local n_periods 20
+local seed 42
+
 // Load dependencies:
-do programs/prepare_panel_scm.do
-do programs/calculate_rmspe.do
-do programs/conduct_scm.do
 do programs/scm_simulation.do
 
 
@@ -17,8 +21,9 @@ foreach a of local treatment_effects {
 		 avg_effect_treated_unit = e(avg_effect_treated_unit) ///
 		 count_rspme_ratio_higher = e(count_rspme_ratio_higher) ///
 		 count_avg_deviation_higher = e(count_avg_deviation_higher), ///
-		 reps(2): scm_simulation 21 30 `a' constant
-	
+		 seed(`seed') ///
+		 reps(`n_reps'): scm_simulation `n_periods' `n_units' `a' constant
+		 
 	save "simulations/simul_`a'_january", replace
 }
 
