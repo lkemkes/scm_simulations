@@ -23,7 +23,7 @@ foreach a of local treatment_effects {
 		 count_rspme_ratio_higher = e(count_rspme_ratio_higher) ///
 		 count_avg_deviation_higher = e(count_avg_deviation_higher), ///
 		 seed(`seed') ///
-		 reps(`n_reps'): scm_simulation `n_periods' `trperiod' `n_units' `a' constant
+		 reps(`n_reps'): scm_simulation `n_periods' `n_units' `trperiod' 
 		 
 	save "simulations/simul_`a'_january", replace
 }

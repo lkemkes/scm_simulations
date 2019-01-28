@@ -10,8 +10,11 @@ set more off
 * synth_smoking.dta is stored using the "cd" command.
 sysuse synth_smoking, clear
 
-* Create a folder for intermediate results:
-mkdir replication_data
+* Create a folder for intermediate results if it doesn't exist yet:
+mata : st_numscalar("folderexists", direxists("replication_data"))
+if scalar(folderexists) == 0 {
+	mkdir replication_data
+}
 
 * Declare the panelvar and timevar for the panel
 tsset state year

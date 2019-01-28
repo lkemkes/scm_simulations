@@ -11,7 +11,7 @@ program define prepare_panel_resembling_ca_data
 /* Prepare a panel dataset with simulated data for using the Synthetic 
 Control Method (SCM). The generated data will be based on empirical
 characteristics of the California tobacco dataset. */
-	args n_periods n_units trperiod treatment_effect treatment_effect_type
+	args n_periods n_units trperiod
 	
 	* Create an empty panel dataset
 	instantiate_panel `n_periods' `n_units'
@@ -65,22 +65,18 @@ characteristics of the California tobacco dataset. */
 	* Generate unobserved common factors belonging to factor loadings
 	gen lambda1 = 0.5 * period
 	
-	* Generate the true dependent variable
-	if "`treatment_effect_type'" == "linear_in_time" {
-		gen Y = delta_t + `treatment_effect'*(period - `trperiod')*T + ///
-			theta1*Z1 + theta2*Z2 + theta3*Z3 + theta4*Z4 + theta5*Z5 + ///
-			lambda1*mu1 + rnormal(0, 1)
-	}
-	else if "`treatment_effect_type'" == "constant" {
-		gen Y = delta_t + `treatment_effect'*T + ///
-			theta1*Z1 + theta2*Z2 + theta3*Z3 + theta4*Z4 + theta5*Z5 + ///
-			lambda1*mu1 + rnormal(0, 1)
-	}
+	* Generate the treatment effect alpha_it
+	merge m:1 period using "alpha_it.dta", nogen
+	replace alpha_it = 0 if unit != 1
+	replace alpha_it = 0 if period < 20
 	
-	* TODO: else { raise an error }
+	* Generate the true dependent variable
+	gen Y = delta_t + alpha_it*T + ///
+			theta1*Z1 + theta2*Z2 + theta3*Z3 + theta4*Z4 + theta5*Z5 + ///
+			lambda1*mu1 + rnormal(0, 1)
 	
 	tsset unit period
 	
 end
 
-prepare_panel_resembling_ca_data 20 10 11 20 "constant"
+prepare_panel_resembling_ca_data 31 39 20
