@@ -11,7 +11,7 @@ set more off
 ********************************************************************************
 // Get estimates for the treatment effects alpha_it
 ********************************************************************************
-
+/*
 * Load the California dataset
 sysuse synth_smoking, clear
 
@@ -33,7 +33,7 @@ keep period alpha_it
 drop if alpha_it == .
 save "alpha_it.dta", replace
 
-
+*/
 ********************************************************************************
 // Get mean vector and variance-covariance matrix of the covariates
 ********************************************************************************
@@ -110,6 +110,15 @@ gen Y_N = Y - alpha_it
 xi: reg Y_N i.year i.year|Z1 i.year|Z2 i.year|Z3 i.year|Z4 i.year|Z5 i.state, noconstant
 mat b = e(b)
 
+* Residuals epsilon_it
+predict Y_N_hat
+gen residual = Y_N - Y_N_hat
+sum residual
+global residuals_std = r(sd)
+di "$residuals_std"
+histogram residual
+graph save "graphs/regression_residuals.png", replace
+
 gen state_fixed_effect = 0
 forvalues state = 2/39 {
 	local wherestatefecol = colnumb(b,"_Istate_`state'")
@@ -151,14 +160,7 @@ regress theta_3 L.theta_3 if state == 1
 sum theta_3 theta_4 theta_5
 
 
-* Residuals epsilon_it
-predict Y_N_hat
-gen residual = Y_N - Y_N_hat
-sum residual
-global residuals_std = r(sd)
-di "$residuals_std"
-histogram residual
-graph save "graphs/regression_residuals.png", replace
+
 
 
 *mlexp ( lnnormalden(residual, ({b2}^2*{b3} + {b4}^2*{b1})/({b2}^2 + {b4}^2), 1/(1/{b2}^2 + 1/{b4}^2) ))

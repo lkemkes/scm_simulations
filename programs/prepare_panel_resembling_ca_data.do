@@ -74,10 +74,10 @@ characteristics of the California tobacco dataset. */
 	di "Created treatment effect"
 	
 	* Generate noise
-	local epsilon = rnormal(0, 84)
+	local epsilon = rnormal(0, 8)
 	gen epsilon = `epsilon'
 	forvalues i = 2/1209 {
-		local epsilon = rnormal(0, 84)
+		local epsilon = rnormal(0, 8)
 		replace epsilon = `epsilon' if _n == `i'
 	}
 	di "Generated noise"
@@ -91,4 +91,6 @@ characteristics of the California tobacco dataset. */
 	
 end
 
-prepare_panel_resembling_ca_data 31 39 20 no
+set more off
+prepare_panel_resembling_ca_data 31 20 39 yes
+histogram Y
