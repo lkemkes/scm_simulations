@@ -25,7 +25,7 @@ foreach treat of local treatment {
 		 count_rspme_ratio_higher = e(count_rspme_ratio_higher) ///
 		 count_avg_deviation_higher = e(count_avg_deviation_higher), ///
 		 seed(`seed') ///
-		 reps(`n_reps'): scm_simulation `n_periods' `trperiod' `n_units' "`treat'"
+		 reps(`n_reps'): scm_simulation `n_periods' `trperiod' `n_units' `treat'
 		 
 	save "simulations/simulations_treat=`treat'", replace
 

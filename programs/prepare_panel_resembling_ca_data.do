@@ -61,8 +61,9 @@ characteristics of the California tobacco dataset. */
 	* Generate unobserved common factors belonging to factor loadings
 	gen lambda1 = 1
 	
+	di "`treat'"
 	* Generate the treatment effect alpha_it
-	if `treat' == "yes" {
+	if "`treat'" == "yes" {
 		merge m:1 period using "alpha_it.dta", nogen
 		replace alpha_it = 0 if unit != 1
 		replace alpha_it = 0 if period < 20
@@ -70,14 +71,24 @@ characteristics of the California tobacco dataset. */
 	else {
 		gen alpha_it = 0
 	}
+	di "Created treatment effect"
+	
+	* Generate noise
+	local epsilon = rnormal(0, 84)
+	gen epsilon = `epsilon'
+	forvalues i = 2/1209 {
+		local epsilon = rnormal(0, 84)
+		replace epsilon = `epsilon' if _n == `i'
+	}
+	di "Generated noise"
 	
 	* Generate the true dependent variable
 	gen Y = delta_t + alpha_it*T + ///
 			theta1*Z1 + theta2*Z2 + theta3*Z3 + theta4*Z4 + theta5*Z5 + ///
-			lambda1*mu1 + rnormal(0, "$residuals_std")
+			lambda1*mu1 + epsilon
 	
 	tsset unit period
 	
 end
 
-prepare_panel_resembling_ca_data 31 39 20
+prepare_panel_resembling_ca_data 31 39 20 no
