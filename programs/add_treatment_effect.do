@@ -4,7 +4,7 @@
 set more off
 
 // Load dependencies
-do programs/prepare_panel_resembling_ca_data.do
+*do programs/prepare_panel_resembling_ca_data.do
 
 
 capture program drop add_treatment_effect
@@ -14,7 +14,7 @@ is a linear function from 0 to treatment_in_percent times the mean of Y.*/
 	args n_periods trperiod treatment_in_percent
 	
 	* Calculate values for treatment effect
-	qui sum Y
+	qui sum Y if unit == 1
 	local mean_y = r(mean)
 
 	cap drop alpha_it
