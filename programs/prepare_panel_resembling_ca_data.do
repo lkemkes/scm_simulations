@@ -36,26 +36,16 @@ characteristics of the California tobacco dataset. */
 	* Generate coefficients theta_i for covariates Z_i
 	gen theta1 = -20 - 2.5 * (period - 1)
 	gen theta2 = 1.5 - 0.1 * (period - 1)
-	gen theta3 = 195 if period == 1
-	gen theta4 = 1 if period == 1
-	gen theta5 = 1.1 if period == 1
-	forvalues t = 2/`n_periods' {
-		local theta3 = rnormal(195, 130)
-		local theta4 = rnormal(1, 0.2)
-		local theta5 = rnormal(1.1, 0.2)
-		replace theta3 = `theta3'
-		replace theta4 = `theta4'
-		replace theta5 = `theta5'
-	}
+	gen theta3 = rnormal(195, 130)
+	gen theta4 = rnormal(1, 0.2)
+	gen theta5 = rnormal(1.1, 0.2)
 	
 	* Generate factor loadings
-	forvalues i = 1/`n_units' {
+	local mu1 = runiform(-10, 22)
+	gen mu1 = `mu1'
+	forvalues 2 = 1/`n_units' {
 		local mu1 = runiform(-10, 22)
-		
-		capture gen mu1 = `mu1'
-		if _rc != 0 {
-			replace mu1 = `mu1' if unit == `i'
-		}
+		replace mu1 = `mu1' if unit == `i'
 	}
 	
 	* Generate unobserved common factors belonging to factor loadings
@@ -74,12 +64,7 @@ characteristics of the California tobacco dataset. */
 	di "Created treatment effect"
 	
 	* Generate noise
-	local epsilon = rnormal(0, 8)
-	gen epsilon = `epsilon'
-	forvalues i = 2/1209 {
-		local epsilon = rnormal(0, 8)
-		replace epsilon = `epsilon' if _n == `i'
-	}
+	gen epsilon = rnormal(0, 8)
 	di "Generated noise"
 	
 	* Generate the true dependent variable
