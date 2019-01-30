@@ -3,7 +3,7 @@
 set more off
 
 // Load dependencies
-*do programs/prepare_panel_resembling_ca_data.do
+do programs/add_treatment_effect.do
 do programs/conduct_scm.do
 
 capture program drop scm_simulation
@@ -15,7 +15,7 @@ program define scm_simulation, eclass
 	di `trperiod'
 	
 	prepare_panel_resembling_ca_data `n_periods' `trperiod' `n_units'
-	add_treatment_effect `n_periods' `trperiod' `n_units' "`treatment_percent'"
+	add_treatment_effect `n_periods' `trperiod' "`treatment_percent'"
 	
 	* SCM
 	di "Starting SCM now..."

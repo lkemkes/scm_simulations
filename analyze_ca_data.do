@@ -150,17 +150,30 @@ forvalues i = 1/5 {
 	}
 }
 
-tsline theta_1 if state == 1
-tsline theta_2 if state == 1
-tsline theta_3 if state == 1
-tsline theta_4 if state == 1
-tsline theta_5 if state == 1
 sort state year
-regress theta_3 L.theta_3 if state == 1
-sum theta_3 theta_4 theta_5
+
+tsline theta_1 if state == 1
+gen theta_1_detrend = theta_1 - L.theta_1
+tsline theta_1_detrend if state == 1
+
+tsline theta_2 if state == 1
+
+tsline theta_3 if state == 1
+gen theta_3_detrend = theta_3 - L.theta_3
+tsline theta_3_detrend if state == 1
+
+tsline theta_4 if state == 1
+gen theta_4_detrend = theta_4 - L.theta_4
+tsline theta_4_detrend if state == 1
+
+tsline theta_5 if state == 1
+gen theta_5_detrend = theta_5 - L.theta_5
+tsline theta_5_detrend if state == 1
+
+sum theta_3_detrend theta_4_detrend theta_5_detrend
 
 
-
+*xtreg Y_N i.year year#c.Z1 year#c.Z2 year#c.Z3 year#c.Z4 year#c.Z5, re
 
 
 *mlexp ( lnnormalden(residual, ({b2}^2*{b3} + {b4}^2*{b1})/({b2}^2 + {b4}^2), 1/(1/{b2}^2 + 1/{b4}^2) ))

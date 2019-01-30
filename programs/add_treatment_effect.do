@@ -4,7 +4,7 @@
 set more off
 
 // Load dependencies
-*do programs/prepare_panel_resembling_ca_data.do
+do programs/prepare_panel_resembling_ca_data.do
 
 
 capture program drop add_treatment_effect
