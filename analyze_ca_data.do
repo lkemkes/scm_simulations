@@ -117,9 +117,21 @@ replace alpha_it = 0 if state != 3
 replace alpha_it = 0 if year < 1989
 gen Y_N = Y - alpha_it
 
-xi: reg Y_N i.year i.year|Z1 i.year|Z2 i.year|Z3 i.year|Z4 i.year|Z5 i.state, noconstant
+
+* Factor analysis
+forvalues i = 1/39{
+	cap drop state_`i'
+	gen state_`i' = 0
+	replace state_`i' = 1 if state == `i'
+}
+factor Y_N state_2-state_39, factors(5)
+
+set matsize 2000 /* Set the max. number of variables for a model to 2000 */
+*xi: reg Y_N i.state*i.period, noconstant
+xi: reg Y_N i.year|Z1 i.year|Z2 i.year|Z3 i.year|Z4 i.year|Z5 i.period*i.state, noconstant
 mat b = e(b)
 
+/*
 * Residuals epsilon_it
 predict Y_N_hat
 gen residual = Y_N - Y_N_hat
@@ -199,4 +211,13 @@ sum theta_3_detrend theta_4_detrend theta_5_detrend
 
 
 *mlexp ( lnnormalden(residual, ({b2}^2*{b3} + {b4}^2*{b1})/({b2}^2 + {b4}^2), 1/(1/{b2}^2 + 1/{b4}^2) ))
+*/
 
+
+********************************************************************************
+// Factor Analysis
+********************************************************************************
+* Re-load California data
+sysuse synth_smoking, clear
+tsset state year
+factor cigsale lnincome beer age15to24 retprice
