@@ -33,7 +33,17 @@ keep period alpha_it
 drop if alpha_it == .
 save "alpha_it.dta", replace
 
+
+
+********************************************************************************
+// Histogram cigsales
+********************************************************************************
+sysuse synth_smoking, clear
+tsset state year
+histogram cigsale, title("Distribution of dependent variable in CA tobacco data")
+graph export "graphs/histogram_ca.png"
 */
+
 ********************************************************************************
 // Get mean vector and variance-covariance matrix of the covariates
 ********************************************************************************
@@ -116,8 +126,9 @@ gen residual = Y_N - Y_N_hat
 sum residual
 global residuals_std = r(sd)
 di "$residuals_std"
-histogram residual
-graph save "graphs/regression_residuals.png", replace
+histogram residual, ///
+	title("Distribution of residuals in the CA tobacco data") xtitle("Residual")
+graph export "graphs/regression_residuals.png", replace
 
 gen state_fixed_effect = 0
 forvalues state = 2/39 {
@@ -125,8 +136,10 @@ forvalues state = 2/39 {
 	local state_fixed_effect = b[1,`wherestatefecol']
 	replace state_fixed_effect = `state_fixed_effect' if state == `state'
 }
-histogram state_fixed_effect if year == 1970, bin(15)
-graph save "graphs/state_fixed_effects.png", replace
+histogram state_fixed_effect if year == 1970, bin(15) ///
+	title("Distribution of state fixed effects in CA tobacco data") ///
+	xtitle("State fixed effect")
+graph export "graphs/state_fixed_effects.png", replace
 
 
 gen time_fixed_effect = 0
@@ -135,8 +148,9 @@ forvalues year = 1971/2000 {
 	local year_fixed_effect = b[1,`whereyearfecol']
 	replace time_fixed_effect = `year_fixed_effect' if year == `year'
 }
-tsline time_fixed_effect if state == 1
-graph save "graphs/time_fixed_effects.png", replace
+tsline time_fixed_effect if state == 1, ///
+	title("Time fixed effects in CA tobacco data") ytitle("Time fixed effect")
+graph export "graphs/time_fixed_effects.png", replace
 
 
 forvalues i = 1/5 {
@@ -152,15 +166,23 @@ forvalues i = 1/5 {
 
 sort state year
 
-tsline theta_1 if state == 1
+tsline theta_1 if state == 1, ytitle("Coefficient") ///
+	title("Evolution of the first theta coefficient in the CA tobacco data")
+graph export "graphs/theta1.png", replace
 gen theta_1_detrend = theta_1 - L.theta_1
 tsline theta_1_detrend if state == 1
 
 tsline theta_2 if state == 1
 
-tsline theta_3 if state == 1
+tsline theta_3 if state == 1, ytitle("Coefficient") ///
+	title("Evolution of the third theta coefficient in the CA tobacco data")
+graph export "graphs/theta3.png", replace
 gen theta_3_detrend = theta_3 - L.theta_3
-tsline theta_3_detrend if state == 1
+tsline theta_3_detrend if state == 1, ///
+	ytitle("Coefficient change") ///
+	title("First differences of the third theta coefficient") ///
+	subtitle("in the CA tobacco data")
+graph export "graphs/theta3_detrend.png", replace
 
 tsline theta_4 if state == 1
 gen theta_4_detrend = theta_4 - L.theta_4
