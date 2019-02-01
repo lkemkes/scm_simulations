@@ -78,6 +78,11 @@ end
 
 set more off
 prepare_panel_resembling_ca_data 31 20 39
+histogram Y, ///
+	title("Distribution of dependent variable in random sample") ///
+	subtitle("from the defined data generation process")
+graph export "graphs/histogram_sample.png", replace
+
+
 *xtline Y
-*histogram Y
 
