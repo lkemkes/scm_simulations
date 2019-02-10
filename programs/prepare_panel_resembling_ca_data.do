@@ -4,8 +4,8 @@
 set more off
 
 // Load dependencies
-*do programs/generate_covariates_ca.do
-*do programs/instantiate_panel.do
+do programs/generate_covariates_ca.do
+do programs/instantiate_panel.do
 
 
 capture program drop prepare_panel_resembling_ca_data
@@ -31,7 +31,7 @@ treatment effect yet. */
 	merge m:1 unit using `ca_covariates_sim.dta'
 		
 	* Generate time-fixed value delta_t
-	local delta_t = rnormal(20, 5)
+	local delta_t = rnormal(150, 5)
 	gen delta_t = `delta_t'
 	forvalues period = 2/`n_periods' {
 		local delta_t = `delta_t' + rnormal(1, 5)
