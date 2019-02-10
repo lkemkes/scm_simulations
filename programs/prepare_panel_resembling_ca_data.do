@@ -40,20 +40,20 @@ treatment effect yet. */
 	* Generate coefficients theta_i for covariates Z_i
 	local theta1 = rnormal(-2.5, 5.5)
 	local theta2 = rnormal(0, 0.15)
-	local theta3 = rnormal(8.337215, 107.9198)
-	local theta4 = rnormal(.0009622, 0.1545717)
-	local theta5 = rnormal(-0.0062764 , 0.0519627)
+	local theta3 = rnormal(8, 108)
+	local theta4 = rnormal(0, 0.15)
+	local theta5 = rnormal(0, 0.05)
 	gen theta1 = `theta1'
 	gen theta2 = `theta2'
 	gen theta3 = `theta3'
 	gen theta4 = `theta4'
 	gen theta5 = `theta5'
 	forvalues period = 2/`n_periods' {
-		local theta1 = `theta1' + rnormal(-2.5, 5.5)
+		local theta1 = `theta1' + rnormal(0, 5.5)
 		local theta2 = `theta2' + rnormal(0, 0.15)
-		local theta3 = `theta3' + rnormal(0, 107.9198)
-		local theta4 = `theta4' + rnormal(0, 0.1545717)
-		local theta5 = `theta5' + rnormal(0, 0.0519627)
+		local theta3 = `theta3' + rnormal(0, 108)
+		local theta4 = `theta4' + rnormal(0, 0.15)
+		local theta5 = `theta5' + rnormal(0, 0.05)
 		replace theta1 = `theta1' if period == `period'
 		replace theta2 = `theta2' if period == `period'
 		replace theta3 = `theta3' if period == `period'
@@ -70,7 +70,12 @@ treatment effect yet. */
 	}
 	
 	* Generate unobserved common factors belonging to factor loadings
-	gen lambda1 = 1
+	local lambda1 = rnormal(0, 1)
+	gen lambda1 = `lambda1'
+	forvalues period = 2/`n_periods' {
+		local lambda1 = `lambda1' + rnormal(0, 1)
+		replace lambda1 = `lambda1' if period == `period'
+	}
 		
 	* Generate noise
 	gen epsilon = rnormal(0, 8)
@@ -89,10 +94,12 @@ histogram Y, ///
 	subtitle("from the defined data generation process")
 graph export "graphs/histogram_sample.png", replace
 
+
+sort unit period
 forvalues i = 1/5 {
 	gen Ztheta`i' = Z`i' * theta`i'
+	gen theta`i'_detrend = theta`i' - L.theta`i'
 }
-
+sort period unit
 
 * xtline Y
-
