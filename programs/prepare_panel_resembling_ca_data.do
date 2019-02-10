@@ -31,7 +31,12 @@ treatment effect yet. */
 	merge m:1 unit using `ca_covariates_sim.dta'
 		
 	* Generate time-fixed value delta_t
-	gen delta_t = 25 * (period - 1)
+	local delta_t = rnormal(20, 5)
+	gen delta_t = `delta_t'
+	forvalues period = 2/`n_periods' {
+		local delta_t = `delta_t' + rnormal(1, 5)
+		replace delta_t = `delta_t' if period == `period'
+	}
 	
 	* Generate treatment dummy T
 	gen T = 0
