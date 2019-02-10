@@ -4,8 +4,8 @@
 set more off
 
 // Load dependencies
-do programs/generate_covariates_ca.do
-do programs/instantiate_panel.do
+*do programs/generate_covariates_ca.do
+*do programs/instantiate_panel.do
 
 
 capture program drop prepare_panel_resembling_ca_data
@@ -38,18 +38,24 @@ treatment effect yet. */
 	replace T = 1 if unit == 1 & period >= `trperiod'
 			
 	* Generate coefficients theta_i for covariates Z_i
-	gen theta1 = -20 - 2.5 * (period - 1)
-	gen theta2 = 1.5 - 0.1 * (period - 1)
+	local theta1 = rnormal(-2.5, 5.5)
+	local theta2 = rnormal(0, 0.15)
 	local theta3 = rnormal(8.337215, 107.9198)
 	local theta4 = rnormal(.0009622, 0.1545717)
 	local theta5 = rnormal(-0.0062764 , 0.0519627)
+	gen theta1 = `theta1'
+	gen theta2 = `theta2'
 	gen theta3 = `theta3'
 	gen theta4 = `theta4'
 	gen theta5 = `theta5'
 	forvalues period = 2/`n_periods' {
+		local theta1 = `theta1' + rnormal(-2.5, 5.5)
+		local theta2 = `theta2' + rnormal(0, 0.15)
 		local theta3 = `theta3' + rnormal(0, 107.9198)
 		local theta4 = `theta4' + rnormal(0, 0.1545717)
 		local theta5 = `theta5' + rnormal(0, 0.0519627)
+		replace theta1 = `theta1' if period == `period'
+		replace theta2 = `theta2' if period == `period'
 		replace theta3 = `theta3' if period == `period'
 		replace theta4 = `theta4' if period == `period'
 		replace theta5 = `theta5' if period == `period'
@@ -83,6 +89,10 @@ histogram Y, ///
 	subtitle("from the defined data generation process")
 graph export "graphs/histogram_sample.png", replace
 
+forvalues i = 1/5 {
+	gen Ztheta`i' = Z`i' * theta`i'
+}
 
-*xtline Y
+
+* xtline Y
 
