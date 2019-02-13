@@ -3,7 +3,7 @@ set more off
 
 
 // Define parameters:
-local n_reps 1000
+local n_reps 500
 local n_units 39
 local n_periods 31
 local trperiod 20
@@ -16,7 +16,7 @@ do programs/calculate_rmspe.do
 
 
 // Conduct simulations:
-local treatment_in_percent 0 40
+local treatment_in_percent 60
 foreach treat of local treatment_in_percent {
 
 	di `treat'
@@ -27,6 +27,6 @@ foreach treat of local treatment_in_percent {
 		 seed(`seed') ///
 		 reps(`n_reps'): scm_simulation `n_periods' `trperiod' `n_units' `treat'
 		 
-	save "simulations/simulations_treatment=`treat'_n=`n_reps'", replace
+	save "simulations/20190210_treatment_=`treat'_n=`n_reps'", replace
 
 }
