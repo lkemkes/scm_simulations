@@ -11,7 +11,7 @@ set more off
 ********************************************************************************
 // Get estimates for the treatment effects alpha_it
 ********************************************************************************
-/*
+
 * Load the California dataset
 sysuse synth_smoking, clear
 
@@ -42,7 +42,7 @@ sysuse synth_smoking, clear
 tsset state year
 histogram cigsale, title("Distribution of dependent variable in CA tobacco data")
 graph export "graphs/histogram_ca.png"
-*/
+
 
 ********************************************************************************
 // Get mean vector and variance-covariance matrix of the covariates
@@ -117,7 +117,7 @@ replace alpha_it = 0 if state != 3
 replace alpha_it = 0 if year < 1989
 gen Y_N = Y - alpha_it
 
-
+/*
 * Factor analysis
 forvalues i = 1/39{
 	cap drop state_`i'
@@ -125,13 +125,14 @@ forvalues i = 1/39{
 	replace state_`i' = 1 if state == `i'
 }
 factor Y_N state_2-state_39, factors(5)
+*/
 
 set matsize 2000 /* Set the max. number of variables for a model to 2000 */
-*xi: reg Y_N i.state*i.period, noconstant
-xi: reg Y_N i.year|Z1 i.year|Z2 i.year|Z3 i.year|Z4 i.year|Z5 i.period*i.state, noconstant
+xi: reg Y_N i.year i.year|Z1 i.year|Z2 i.year|Z3 i.year|Z4 i.year|Z5 i.state, noconstant
+*xi: reg Y_N i.year|Z1 i.year|Z2 i.year|Z3 i.year|Z4 i.year|Z5 i.period*i.state, noconstant
 mat b = e(b)
 
-/*
+
 * Residuals epsilon_it
 predict Y_N_hat
 gen residual = Y_N - Y_N_hat
@@ -153,6 +154,8 @@ histogram state_fixed_effect if year == 1970, bin(15) ///
 	xtitle("State fixed effect")
 graph export "graphs/state_fixed_effects.png", replace
 
+sort state year
+
 
 gen time_fixed_effect = 0
 forvalues year = 1971/2000 {
@@ -163,6 +166,10 @@ forvalues year = 1971/2000 {
 tsline time_fixed_effect if state == 1, ///
 	title("Time fixed effects in CA tobacco data") ytitle("Time fixed effect")
 graph export "graphs/time_fixed_effects.png", replace
+gen time_fixed_detrend = time_fixed_effect - L.time_fixed_effect
+tsline time_fixed_detrend if state == 1
+graph export "graphs/time_fixed_detrend.png", replace
+
 
 
 forvalues i = 1/5 {
@@ -176,48 +183,81 @@ forvalues i = 1/5 {
 	}
 }
 
-sort state year
+
 
 tsline theta_1 if state == 1, ytitle("Coefficient") ///
-	title("Evolution of the first theta coefficient in the CA tobacco data")
+	title("Evolution of the first theta coefficient") ///
+	subtitle("in the CA tobacco control program dataset")
 graph export "graphs/theta1.png", replace
 gen theta_1_detrend = theta_1 - L.theta_1
-tsline theta_1_detrend if state == 1
+tsline theta_1_detrend if state == 1, ///
+	ytitle("Coefficient change") ///
+	title("First differences of the first theta coefficient") ///
+	subtitle("in the CA tobacco control program dataset")
+graph export "graphs/theta1_detrend.png", replace
 
-tsline theta_2 if state == 1
+
+tsline theta_2 if state == 1, ytitle("Coefficient") ///
+	title("Evolution of the second theta coefficient") ///
+	subtitle("in the CA tobacco control program dataset")
+graph export "graphs/theta2.png", replace
+gen theta_2_detrend = theta_2 - L.theta_2
+tsline theta_2_detrend if state == 1, ///
+	ytitle("Coefficient change") ///
+	title("First differences of the second theta coefficient") ///
+	subtitle("in the CA tobacco control program dataset")
+graph export "graphs/theta2_detrend.png", replace
+
 
 tsline theta_3 if state == 1, ytitle("Coefficient") ///
-	title("Evolution of the third theta coefficient in the CA tobacco data")
+	title("Evolution of the third theta coefficient") ///
+	subtitle("in the CA tobacco control program dataset")
 graph export "graphs/theta3.png", replace
 gen theta_3_detrend = theta_3 - L.theta_3
 tsline theta_3_detrend if state == 1, ///
 	ytitle("Coefficient change") ///
 	title("First differences of the third theta coefficient") ///
-	subtitle("in the CA tobacco data")
+	subtitle("in the CA tobacco control program dataset")
 graph export "graphs/theta3_detrend.png", replace
 
-tsline theta_4 if state == 1
+tsline theta_4 if state == 1, ytitle("Coefficient") ///
+	title("Evolution of the fourth theta coefficient") ///
+	subtitle("in the CA tobacco control program dataset")
+graph export "graphs/theta4.png", replace
 gen theta_4_detrend = theta_4 - L.theta_4
-tsline theta_4_detrend if state == 1
+tsline theta_4_detrend if state == 1, ///
+	ytitle("Coefficient change") ///
+	title("First differences of the fourth theta coefficient") ///
+	subtitle("in the CA tobacco control program dataset")
+graph export "graphs/theta4_detrend.png", replace
 
-tsline theta_5 if state == 1
+tsline theta_5 if state == 1, ytitle("Coefficient") ///
+	title("Evolution of the fifth theta coefficient") ///
+	subtitle("in the CA tobacco control program dataset")
+graph export "graphs/theta5.png", replace
 gen theta_5_detrend = theta_5 - L.theta_5
-tsline theta_5_detrend if state == 1
+tsline theta_5_detrend if state == 1, ///
+	ytitle("Coefficient change") ///
+	title("First differences of the fifth theta coefficient") ///
+	subtitle("in the CA tobacco control program dataset")
+graph export "graphs/theta5_detrend.png", replace
 
-sum theta_3_detrend theta_4_detrend theta_5_detrend
+
+sum theta_1_detrend-theta_5_detrend
+
 
 
 *xtreg Y_N i.year year#c.Z1 year#c.Z2 year#c.Z3 year#c.Z4 year#c.Z5, re
 
 
 *mlexp ( lnnormalden(residual, ({b2}^2*{b3} + {b4}^2*{b1})/({b2}^2 + {b4}^2), 1/(1/{b2}^2 + 1/{b4}^2) ))
-*/
 
 
+/*
 ********************************************************************************
 // Factor Analysis
 ********************************************************************************
 * Re-load California data
 sysuse synth_smoking, clear
 tsset state year
-factor cigsale lnincome beer age15to24 retprice
+factor cigsale lnincome beer age15to24 retprice*/
